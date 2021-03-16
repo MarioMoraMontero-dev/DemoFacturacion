@@ -27,7 +27,10 @@ export class RegistrarFacturaComponent implements OnInit {
   FacturaAgregada!:string;
   documentoAgregado!:boolean;
   botonVolverAenviar!:boolean;
-  tipoFacturas:string[] = ["--Tipo de factura--","Alimentación","Transporte","Hospedaje","Pases Aéreos","Kilometraje"];
+  ProcesandoFactura!:boolean;
+  SinFactura!:boolean;
+  EroresFormularioFactura!:boolean;
+  tipoFacturas:string[] = ["Alimentación","Transporte","Hospedaje","Pases Aéreos","Kilometraje"];
   public ocultarSeccionArchivoPDF!:boolean;
   ngOnInit(): void {
     this.ocultarSeccionArchivoPDF = true;
@@ -38,17 +41,19 @@ export class RegistrarFacturaComponent implements OnInit {
     this.botonEnviar = false;
     this.botonVolverAenviar = true;
     this.documentoAgregado = true;
+    this.ProcesandoFactura = true;
+    this.SinFactura = true;
+    this.EroresFormularioFactura = true;
   }
 
   private buildForm(){
     this.form = this.formBuilder.group({
-      fechaDeRegistro: [''],
-      tipoFactura: [''],
-      detalleFactura: [''],
-      montoFactura: ['']
+      fechaDeRegistro: ['',[Validators.required]],
+      tipoFactura: ['',[Validators.required]],
+      detalleFactura: ['',[Validators.pattern("^[0-9.]*")]],
+      montoFactura: ['',[Validators.pattern("^[0-9]*")]]
      
     });
-    this.form.controls['tipoFactura'].setValue('--Tipo de factura--', {onlySelf: true});
     //#region FechaRegistro
       this.form.get('fechaDeRegistro')?.valueChanges
       .subscribe(value =>{
@@ -104,6 +109,7 @@ this.form.get('tipoFactura')?.valueChanges
 
 
   onFileChanged(event:any) {
+    this.SinFactura = true;
     const  fileUploadBodies = this.getBase64EncodedFileData(event.target.files[0].name);
     console.log(event.target.files[0]);
     console.log(event.target.files[0].type);
@@ -134,6 +140,8 @@ this.form.get('tipoFactura')?.valueChanges
   }
 
   getToken(){
+    
+    this.EroresFormularioFactura = true;
       this.rest.getToken().subscribe((data: {})=>{
       console.log(data);
       this.login.push(data);
@@ -144,29 +152,41 @@ this.form.get('tipoFactura')?.valueChanges
       
 
   sendFactura(datos:any){
-    for(let l of datos) {
-      this.token = l.access_token;
-      this.facNew.token = l.access_token;
-      console.log("SalidaToken: "+this.token);
-    }
-    this.rest.postaddFactura(this.token,this.facNew) .subscribe((data: {})=>{
-      console.log(data);
-      this.respuesta.push(data);
-      for(let l of this.respuesta){
-        if(l.Estado = 'Creado'){
-          this.botonEnviar = true;
-          this.FacturaCreada = false;
-          this.ErrorFactura = true;
-          this.botonVolverAenviar = false;
-          
-        }else{
-          this.botonEnviar = false;
-          this.FacturaCreada = true;
-          this.ErrorFactura = false;
-        }
+    
+    if(this.facNew.factura == null || this.facNew.factura == undefined){
+      this.SinFactura = false;
+    }else{
+      this.SinFactura = true;
+      for(let l of datos) {
+        this.token = l.access_token;
+        this.facNew.token = l.access_token;
+        console.log("SalidaToken: "+this.token);
       }
-      
-    })
+      this.rest.postaddFactura(this.token,this.facNew) .subscribe((data: {})=>{
+        console.log(data);
+        this.respuesta.push(data);
+        for(let l of this.respuesta){
+          if(l.Estado = 'Creado'){
+            this.botonEnviar = true;
+            this.FacturaCreada = false;
+            this.ErrorFactura = true;
+            this.botonVolverAenviar = false;
+            this.ProcesandoFactura = true;
+            this.EroresFormularioFactura = true;
+            
+          }else{
+            this.botonEnviar = false;
+            this.FacturaCreada = true;
+            this.ErrorFactura = false;
+            this.ProcesandoFactura = true;
+            this.EroresFormularioFactura = true;
+            this.botonVolverAenviar = true;
+          }
+        }
+        
+      })
+    }
+    
 }
 
 
@@ -197,13 +217,14 @@ this.form.get('tipoFactura')?.valueChanges
   registrarfactura(event:Event){
     event.preventDefault();
     if(this.form.valid){
-     
+      this.EroresFormularioFactura = true;
+      this.ProcesandoFactura = false;
       
       
     }else{
       this.form.markAllAsTouched();
       console.log(this.form.getError);
-     
+      this.EroresFormularioFactura = false;
     }
     
   }
@@ -211,11 +232,13 @@ this.form.get('tipoFactura')?.valueChanges
 
 agegarOtraFactura(){
   this.form.reset();
+  this.facNew.factura = null;
   this.documentoAgregado = true;
   this.FacturaCreada = true;
   this.ocultarSeccionArchivoPDF = true;
   this.botonEnviar = false;
   this.botonVolverAenviar = true;
+  this.EroresFormularioFactura = true;
 }
 
 }
