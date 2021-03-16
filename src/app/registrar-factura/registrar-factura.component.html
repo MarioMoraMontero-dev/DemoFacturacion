@@ -290,6 +290,20 @@
                                                     </div>
                                                     
                                                 </div>
+                                                <!--formControlName ="montoFactura" -->
+                                                <div class="form-group">
+                                                    <label>Código de viaje</label>
+                                                    <input type="text" placeholder="Código de viaje"  class="form-control form-control" formControlName="codigoViaje" >
+                                                    <div *ngIf="form.get('codigoViaje')?.errors && form.get('codigoViaje')?.touched">
+                                                        <p *ngIf="form.get('codigoViaje')?.hasError('required')" style="color: red;  text-transform: uppercase; font-size:12px !important">
+                                                          Este es un campo requerido
+                                                        </p>
+                                                        <p *ngIf="form.get('codigoViaje')?.hasError('pattern')" style="color: red;  text-transform: uppercase; font-size:12px !important">
+                                                            Solo se permiten valores alfanuméricos
+                                                          </p>
+                                                    </div>
+                                                    
+                                                </div>
                                                 <div class="form-group" style="justify-content:center">
                                                     
                                                     <input type="file" name="file-1" id="file-1" class="inputfile inputfile-1" accept=".pdf,.xml" (change)="onFileChanged($event)" />
@@ -304,14 +318,18 @@
                                                     <div class="form-group">
                                                         <label>Detalle de la factura</label>
                                                         <input type="text" placeholder="Detalle de la factura"  class="form-control form-control"  formControlName="detalleFactura">
-                                                        
+                                                        <div *ngIf="form.get('codigoViaje')?.errors && form.get('codigoViaje')?.touched">
+
+                                                        </div>
                                                     </div>
                                                     <div class="form-group">
                                                         <label>Monto factura</label>
                                                         <input type="text" placeholder="Monto de la factura"  class="form-control form-control" formControlName ="montoFactura" >
+                                                        <div *ngIf="form.get('montoFactura')?.errors && form.get('montoFactura')?.touched">
                                                         <p *ngIf="form.get('montoFactura')?.hasError('pattern')" style="color: red;  text-transform: uppercase; font-size:12px !important">
                                                             Solo se permiten valores numéricos
                                                           </p>
+                                                        </div>
                                                     </div>
                                                     
                                                 </section>

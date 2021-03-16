@@ -50,8 +50,9 @@ export class RegistrarFacturaComponent implements OnInit {
     this.form = this.formBuilder.group({
       fechaDeRegistro: ['',[Validators.required]],
       tipoFactura: ['',[Validators.required]],
-      detalleFactura: ['',[Validators.pattern("^[0-9.]*")]],
-      montoFactura: ['',[Validators.pattern("^[0-9]*")]]
+      detalleFactura: [''],
+      montoFactura: ['',[Validators.pattern("^[0-9]*")]],
+      codigoViaje: ['',[Validators.required,Validators.pattern("^[a-zA-Z0-9]*")]]
      
     });
     //#region FechaRegistro
@@ -94,14 +95,24 @@ this.form.get('montoFactura')?.valueChanges
 //#endregion montoFactura
 
 //#regin tipoFactura 
-this.form.get('tipoFactura')?.valueChanges
+this.form.get('codigoViaje')?.valueChanges
 .subscribe(value =>{
     console.log(value);
+    this.facNew.codigoViaje = value;
 });
 
 //#endregion tipoFactura
 
-  
+//#region CodigoViaje
+  this.form.get('fechaDeRegistro')?.valueChanges
+  .subscribe(value =>{
+      console.log(value);
+      this.facNew.fechaRegistro = value;
+      
+      
+  });
+
+//#endregion CodigoViaje
 
   }
 
@@ -140,8 +151,7 @@ this.form.get('tipoFactura')?.valueChanges
   }
 
   getToken(){
-    
-    this.EroresFormularioFactura = true;
+
       this.rest.getToken().subscribe((data: {})=>{
       console.log(data);
       this.login.push(data);
@@ -219,8 +229,6 @@ this.form.get('tipoFactura')?.valueChanges
     if(this.form.valid){
       this.EroresFormularioFactura = true;
       this.ProcesandoFactura = false;
-      
-      
     }else{
       this.form.markAllAsTouched();
       console.log(this.form.getError);
@@ -228,7 +236,6 @@ this.form.get('tipoFactura')?.valueChanges
     }
     
   }
-
 
 agegarOtraFactura(){
   this.form.reset();

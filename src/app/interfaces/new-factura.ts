@@ -7,4 +7,5 @@ export class NewFactura {
     token:any;
     fechaRegistro:any;
     tipoFacturaRegis:any;
+    codigoViaje:any;
 }
